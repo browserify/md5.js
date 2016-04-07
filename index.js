@@ -3,69 +3,18 @@ var inherits = require('inherits')
 var HashBase = require('hash-base')
 
 function MD5 () {
-  HashBase.call(this)
+  HashBase.call(this, 64)
 
   // state
   this._a = 0x67452301
   this._b = 0xefcdab89
   this._c = 0x98badcfe
   this._d = 0x10325476
-
-  // block data
-  this._block = new Buffer(64) // 64 * 8 = 512 bit
-  this._blockLength = 0
-  this._lengthL = 0
-  this._lengthH = 0
 }
 
 inherits(MD5, HashBase)
 
-MD5.prototype._update = function (data) {
-  // consume data
-  var offset = 0
-  while (this._blockLength + data.length - offset >= 64) {
-    for (var i = this._blockLength; i < 64;) this._block[i++] = data[offset++]
-    this._handleBlock()
-    this._blockLength = 0
-  }
-
-  while (offset < data.length) {
-    this._block[this._blockLength++] = data[offset++]
-  }
-
-  // update length
-  this._lengthL += data.length * 8
-  if (this._lengthL > 0xffffffff) {
-    this._lengthL -= 0x0100000000
-    this._lengthH += 1
-    if (this._lengthH > 0xffffffff) this._lengthH = 0
-  }
-}
-
-MD5.prototype._digest = function () {
-  // create padding and handle blocks
-  this._block[this._blockLength++] = 0x80
-  if (this._blockLength > 56) {
-    this._block.fill(0, this._blockLength, 64)
-    this._handleBlock()
-    this._blockLength = 0
-  }
-
-  this._block.fill(0, this._blockLength, 56)
-  this._block.writeUInt32LE(this._lengthL, 56)
-  this._block.writeUInt32LE(this._lengthH, 60)
-  this._handleBlock()
-
-  // produce result
-  var buffer = new Buffer(16)
-  buffer.writeUInt32LE(this._a, 0)
-  buffer.writeUInt32LE(this._b, 4)
-  buffer.writeUInt32LE(this._c, 8)
-  buffer.writeUInt32LE(this._d, 12)
-  return buffer
-}
-
-MD5.prototype._handleBlock = function () {
+MD5.prototype._update = function () {
   var m = new Array(16)
   for (var i = 0; i < 16; ++i) m[i] = this._block.readUInt32LE(i * 4)
 
@@ -146,6 +95,29 @@ MD5.prototype._handleBlock = function () {
   this._b = (this._b + b) >>> 0
   this._c = (this._c + c) >>> 0
   this._d = (this._d + d) >>> 0
+}
+
+MD5.prototype._digest = function () {
+  // create padding and handle blocks
+  this._block[this._blockOffset++] = 0x80
+  if (this._blockOffset > 56) {
+    this._block.fill(0, this._blockOffset, 64)
+    this._update()
+    this._blockOffset = 0
+  }
+
+  this._block.fill(0, this._blockOffset, 56)
+  this._block.writeUInt32LE(this._length[0], 56)
+  this._block.writeUInt32LE(this._length[1], 60)
+  this._update()
+
+  // produce result
+  var buffer = new Buffer(16)
+  buffer.writeUInt32LE(this._a, 0)
+  buffer.writeUInt32LE(this._b, 4)
+  buffer.writeUInt32LE(this._c, 8)
+  buffer.writeUInt32LE(this._d, 12)
+  return buffer
 }
 
 function rotl (x, n) {

@@ -21,18 +21,16 @@
     "url": "https://github.com:crypto-browserify/md5.js.git"
   },
   "scripts": {
-    "coverage": "nyc node test/*.js",
     "lint": "standard",
     "test": "npm run lint && npm run unit",
     "unit": "node test/*.js"
   },
   "dependencies": {
-    "hash-base": "^1.0.2",
+    "hash-base": "^2.0.0",
     "inherits": "^2.0.1"
   },
   "devDependencies": {
     "hash-test-vectors": "^1.3.2",
-    "nyc": "^6.1.1",
     "standard": "^6.0.8",
     "tape": "^4.2.0"
   }
