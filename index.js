@@ -124,24 +124,20 @@ function rotl (x, n) {
   return ((x << n) | (x >>> (32 - n))) >>> 0
 }
 
-function fnSum (a, f, m, k, s, b) {
-  return (rotl(a + (f >>> 0) + m + k, s) + b) >>> 0
-}
-
 function fnF (a, b, c, d, m, k, s) {
-  return fnSum(a, (b & c) | ((~b) & d), m, k, s, b)
+  return (rotl(a + ((b & c) | ((~b) & d) >>> 0) + m + k, s) + b) >>> 0
 }
 
 function fnG (a, b, c, d, m, k, s) {
-  return fnSum(a, (b & d) | (c & (~d)), m, k, s, b)
+  return (rotl(a + ((b & d) | (c & (~d)) >>> 0) + m + k, s) + b) >>> 0
 }
 
 function fnH (a, b, c, d, m, k, s) {
-  return fnSum(a, b ^ c ^ d, m, k, s, b)
+  return (rotl(a + ((b ^ c ^ d) >>> 0) + m + k, s) + b) >>> 0
 }
 
 function fnI (a, b, c, d, m, k, s) {
-  return fnSum(a, c ^ (b | (~d)), m, k, s, b)
+  return (rotl(a + ((c ^ (b | (~d))) >>> 0) + m + k, s) + b) >>> 0
 }
 
 module.exports = MD5

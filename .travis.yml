@@ -14,4 +14,3 @@ matrix:
     - node_js: "4"
       env: TEST_SUITE=lint
 script: npm run-script $TEST_SUITE
-
