@@ -16,7 +16,7 @@ inherits(MD5, HashBase)
 
 MD5.prototype._update = function () {
   var m = new Array(16)
-  for (var i = 0; i < 16; ++i) m[i] = this._block.readUInt32LE(i * 4)
+  for (var i = 0; i < 16; ++i) m[i] = this._block.readInt32LE(i * 4)
 
   var a = this._a
   var b = this._b
@@ -91,10 +91,10 @@ MD5.prototype._update = function () {
   c = fnI(c, d, a, b, m[2], 0x2ad7d2bb, 15)
   b = fnI(b, c, d, a, m[9], 0xeb86d391, 21)
 
-  this._a = (this._a + a) >>> 0
-  this._b = (this._b + b) >>> 0
-  this._c = (this._c + c) >>> 0
-  this._d = (this._d + d) >>> 0
+  this._a = (this._a + a) | 0
+  this._b = (this._b + b) | 0
+  this._c = (this._c + c) | 0
+  this._d = (this._d + d) | 0
 }
 
 MD5.prototype._digest = function () {
@@ -113,31 +113,31 @@ MD5.prototype._digest = function () {
 
   // produce result
   var buffer = new Buffer(16)
-  buffer.writeUInt32LE(this._a, 0)
-  buffer.writeUInt32LE(this._b, 4)
-  buffer.writeUInt32LE(this._c, 8)
-  buffer.writeUInt32LE(this._d, 12)
+  buffer.writeInt32LE(this._a, 0)
+  buffer.writeInt32LE(this._b, 4)
+  buffer.writeInt32LE(this._c, 8)
+  buffer.writeInt32LE(this._d, 12)
   return buffer
 }
 
 function rotl (x, n) {
-  return ((x << n) | (x >>> (32 - n))) >>> 0
+  return (x << n) | (x >>> (32 - n))
 }
 
 function fnF (a, b, c, d, m, k, s) {
-  return (rotl(a + ((b & c) | ((~b) & d) >>> 0) + m + k, s) + b) >>> 0
+  return (rotl((a + ((b & c) | ((~b) & d)) + m + k) | 0, s) + b) | 0
 }
 
 function fnG (a, b, c, d, m, k, s) {
-  return (rotl(a + ((b & d) | (c & (~d)) >>> 0) + m + k, s) + b) >>> 0
+  return (rotl((a + ((b & d) | (c & (~d))) + m + k) | 0, s) + b) | 0
 }
 
 function fnH (a, b, c, d, m, k, s) {
-  return (rotl(a + ((b ^ c ^ d) >>> 0) + m + k, s) + b) >>> 0
+  return (rotl((a + (b ^ c ^ d) + m + k) | 0, s) + b) | 0
 }
 
 function fnI (a, b, c, d, m, k, s) {
-  return (rotl(a + ((c ^ (b | (~d))) >>> 0) + m + k, s) + b) >>> 0
+  return (rotl((a + ((c ^ (b | (~d)))) + m + k) | 0, s) + b) | 0
 }
 
 module.exports = MD5
