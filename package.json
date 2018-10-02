@@ -1,6 +1,6 @@
 {
   "name": "md5.js",
-  "version": "1.3.4",
+  "version": "1.3.5",
   "description": "node style md5 on pure JavaScript",
   "keywords": [
     "crypto",
